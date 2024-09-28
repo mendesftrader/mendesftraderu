@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code para Paraquedas</title>
+    <link rel="stylesheet" href="css/estilo.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script> <!-- Biblioteca para gerar QR Code -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #qr-code {
+            margin-top: 20px;
+            margin-bottom: 20px;            ;
+            display: none; /* Inicialmente ocultar o QR Code */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gerador de QR Code para Paraquedas</h1>
+
+    <div>
+        <label for="parachuteNumber">Número do Paraquedas:</label>
+        <input type="text" id="parachuteNumber" placeholder="Insira o número do paraquedas">
+        <button onclick="generateQRCode()">Gerar QR Code</button>
+    </div>
+    <!-- Div onde o QR Code será exibido -->
+    <div id="qr-code">
+
+    </div> 
+
+    <script>
+        function generateQRCode() {
+            const parachuteNumber = document.getElementById('parachuteNumber').value;
+
+            if (!parachuteNumber) {
+                alert('Por favor, insira um número de paraquedas.');
+                return;
+            }
+
+            // Limpa o QR Code anterior
+            $('#qr-code').empty();
+
+            // Gera o QR Code
+            $('#qr-code').qrcode({
+                text: parachuteNumber,
+                width: 200,
+                height: 200
+            });
+
+            // Exibe o QR Code
+            $('#qr-code').show();
+        }
+    </script>
+    <div>
+        <button class="button">Imprimir QR Code</button>
+    </div>
+    <div>
+    <button class="button" onclick="location.href='controle.html'">Voltar a página anterior</button>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* Estilo global */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f0f55e;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-image: url(/imagens/dompsa.jpg.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+h1 {
+    color: #4a90e2;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.container {
+    display: flex; /* Define um contêiner flexível */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100vh; /* Define a altura do contêiner como 100% da altura da janela */
+}
+
+label {
+    font-size:larger;
+    color: #080000;
+    font-weight: bold;
+    background-color: #cccccccb;
+    border-radius: 2px;
+    border: 2px solid #080808;
+    margin-left: 10px;
+}
+
+input[type="number"], input[type="text"] {
+    width: calc(40% - 20px);
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 1rem;
+    font-weight: bolder;
+    border: 3px solid #050505;
+    border-radius: 4px;
+    background-color: #eee7e7ad;
+}
+
+input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+button {
+    background-color: #ebee3e9f;
+    color: rgb(14, 13, 13);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 3px solid #070606;
+}
+
+.login{
+    position: absolute; /* Posiciona o botão em relação ao contêiner */
+    top: 10px; /* Distância do topo */
+    right: 10px; /* Distância da direita */
+    padding: 10px 20px;
+    background-color: #ebee3ed2; /* Cor de fundo */
+    color: #0e0b0b; /* Cor do texto */
+    border: none; /* Sem borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor de mão ao passar o mouse */
+    border: 3px solid #070606;
+}
+button:hover {
+    background-color: #10ca10;
+    transform: translateY(-2px);
+    border: 3px solid #070606;
+}
+
+button:hover.delete-btn {
+    background-color: red;
+    transform: translateY(-2px);
+    border: 3px solid #070606;
+}
+.counter {
+    font-size: 2rem;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    color: #4a90e2;
+    background-color: #07060659;
+    margin-right: 90%;
+    margin-left: 10px;
+    border: 3px solid #070606;
+}
+
+.counter.red {
+    background-color: #ffe6e6;
+    color: #e24a4a;
+}   
+
+table {
+    width: 70%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-left: 5px ;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: center;
+    border: 3px solid #070606;
+}
+
+table th {
+    background-color: #ebee3e8a;
+    color: rgb(5, 5, 5);
+    font-size: 1rem;
+}
+
+table tr {
+    background-color: #f8f1f1a4;
+    margin: 0%;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.alert {
+    color: #0a0a0a;
+    font-weight: bold;
+    background-color:red;
+}
+
+.delete-btn{
+    background-color:#ebee3e;
+    border: 3px solid #070606;   
+    margin:0%;
+    font-weight: bolder;
+}
+/* Layout Responsivo */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+
+    input[type="number"], input[type="text"], button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}

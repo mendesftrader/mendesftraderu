@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Paraquedas</title>
+    <link rel="stylesheet" href="css/estilo.css">
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="aba">
+        <button class="login" onclick="addParachutes()"> 2º SGT VIANNA: status-logado</button>
+    </div>
+
+    <!-- faz com que a página seja aberta em uma nova aba -->
+    <!-- <button class="button" onclick="window.open('gerarqrcode.html', '_blank')">Gerar QR Code</button>-->
+    <button class="button" onclick="location.href='gerarqrcode.html'">Gerar QR Code</button>
+
+    <h1>Controle de Paraquedas</h1>
+
+    <div>
+        <label for="initialQuantity">Quantidade inicial de paraquedas: </label>
+        <input type="number" id="initialQuantity" value="100" min="0">
+        <button onclick="setInitialQuantity()">Definir</button>
+        <p></p>
+        <label for="initialQuantity">Quantidade existente de paraquedas: </label>
+    </div>
+
+    <div class="counter" id="parachuteCount">100</div>
+
+    <div class="input-field">
+        <label for="quantity">Quantidade de paraquedas a adicionar/remover:</label>
+        <input type="number" id="quantity" value="1" min="1">
+        <button class="buttons" onclick="addParachutes()">Adicionar</button>
+        <button class="buttons" onclick="removeParachutes()">Remover</button>
+    </div>
+
+    <div class="qr-code-field">
+        <label for="qrCode">Número do paraquedas (ou leia o QR Code):</label>
+        <input type="text" id="qrCode">
+        <p></p>
+        <label for="usageCount">Número de usos:</label>
+        <input type="number" id="usageCount" value="0" min="0">
+        <button onclick="addOrUpdateParachute()">Adicionar/Atualizar Paraquedas</button>
+    </div>
+
+    <div id="qr-reader" style="width:300px; display:none;"></div>
+    <button id="start-qr-reader" onclick="startQrCodeReader()">Iniciar Leitura de QR Code</button>
+    <button id="stop-qr-reader" style="display:none;" onclick="stopQrCodeReader()">Parar Leitura de QR Code</button>
+    
+    <div class="parachute-list">
+        <h2>Lista de Paraquedas</h2>
+        <table id="parachuteTable">
+            <thead>
+                <tr>
+                    <th>Número do Paraquedas</th>
+                    <th>Data de Inclusão</th>
+                    <th>Quantidade de Usos</th>
+                    <th>Exclusão</th> <!-- Adicionando a coluna para ações -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Linhas serão adicionadas dinamicamente aqui -->
+            </tbody>
+        </table>
+        <button onclick="exportToExcel()">Exportar para Excel</button>
+    </div>
+
+    <script>
+        let parachuteCount = 0;
+        let parachuteList = [];
+        let html5QrCode;
+
+        function updateCounter() {
+            const countDisplay = document.getElementById('parachuteCount');
+            countDisplay.innerHTML = parachuteCount;
+
+            if (parachuteCount <= 0) {
+                countDisplay.style.color = "red";
+            } else {
+                countDisplay.style.color = "green";
+            }
+        }
+
+        function setInitialQuantity() {
+            const initialQuantity = document.getElementById('initialQuantity').value;
+            parachuteCount = parseInt(initialQuantity, 10);
+            updateCounter();
+        }
+
+        function addParachutes() {
+            const quantity = parseInt(document.getElementById('quantity').value, 10);
+            parachuteCount += quantity;
+            updateCounter();
+        }
+
+        function removeParachutes() {
+            const quantity = parseInt(document.getElementById('quantity').value, 10);
+            if (parachuteCount - quantity >= 0) {
+                parachuteCount -= quantity;
+            } else {
+                alert('Não há paraquedas suficientes!');
+            }
+            updateCounter();
+        }
+
+        function addOrUpdateParachute() {
+            const qrCode = document.getElementById('qrCode').value;
+            const usageCount = parseInt(document.getElementById('usageCount').value, 10);
+            const currentDate = new Date().toLocaleDateString();
+
+            if (!qrCode) {
+                alert('Por favor, insira o número do paraquedas.');
+                return;
+            }
+
+            let parachute = parachuteList.find(p => p.number === qrCode);
+
+            if (parachute) {
+                parachute.uses += usageCount + 1;
+                alert(`O paraquedas número ${qrCode} já existe. Usos atualizados para: ${parachute.uses}`);
+            } else {
+                parachute = {
+                    number: qrCode,
+                    date: currentDate,
+                    uses: usageCount
+                };
+                parachuteList.push(parachute);
+            }
+
+            updateParachuteTable();
+        }
+
+        function deleteParachute(button) {
+            const row = button.parentNode.parentNode; // Obtém a linha pai do botão
+            const parachuteNumber = row.cells[0].innerText; // Obtém o número do paraquedas
+            parachuteList = parachuteList.filter(p => p.number !== parachuteNumber); // Remove da lista
+            updateParachuteTable(); // Atualiza a tabela
+        }
+
+        function updateParachuteTable() {
+            const tableBody = document.querySelector('#parachuteTable tbody');
+            tableBody.innerHTML = '';
+
+            parachuteList.forEach(parachute => {
+                const row = document.createElement('tr');
+                const alertClass = parachute.uses > 5 ? 'alert' : '';
+                row.innerHTML = `
+                    <td class="${alertClass}">${parachute.number}</td>
+                    <td>${parachute.date}</td>
+                    <td>${parachute.uses}</td>
+                    <td><button class="delete-btn" onclick="deleteParachute(this)">Excluir</button></td> <!-- Botão de excluir -->
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('qrCode').value = decodedText;
+            console.log(`Código QR Escaneado: ${decodedText}`);
+            stopQrCodeReader();
+        }
+
+        function onScanFailure(error) {
+            console.warn(`Erro ao escanear: ${error}`);
+        }
+
+        function startQrCodeReader() {
+            const qrReaderElement = document.getElementById('qr-reader');
+            const startButton = document.getElementById('start-qr-reader');
+            const stopButton = document.getElementById('stop-qr-reader');
+
+            qrReaderElement.style.display = "block";
+            startButton.style.display = "none";
+            stopButton.style.display = "inline";
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.error(`Erro ao iniciar o leitor de QR code: ${err}`);
+                alert("Erro ao acessar a câmera. Verifique se a permissão foi concedida.");
+                stopQrCodeReader();
+            });
+        }
+
+        function stopQrCodeReader() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('qr-reader').style.display = "none";
+                    document.getElementById('start-qr-reader').style.display = "inline";
+                    document.getElementById('stop-qr-reader').style.display = "none";
+                }).catch(err => {
+                    console.error("Erro ao parar o leitor de QR code: ", err);
+                });
+            }
+        }
+
+        function exportToExcel() {
+            //excluí a coluna que não queremos exportar em excel
+            const rows = parachuteTable.querySelectorAll('tr');
+            rows.forEach(row => {row.deleteCell(3);
+            });
+
+            const table = document.getElementById('parachuteTable');
+            const workbook = XLSX.utils.table_to_book(table, { sheet: "Dados" });
+            const ws = workbook.Sheets["Dados"];
+            ws["!cols"] = [{ wpx: 150 }, { wpx: 150 }, { wpx: 150 }, { wpx: 150 }]; // Largura das colunas
+
+            const headerRange = XLSX.utils.decode_range(ws['!ref']);
+            for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ c: col, r: 0 });
+                if (!ws[cellAddress]) continue;
+                ws[cellAddress].s = {
+                    fill: { fgColor: { rgb: "FFFF00" } },
+                    font: { bold: true, color: { rgb: "000000" } }
+                };
+            }
+
+            XLSX.writeFile(workbook, 'dados_paraquedas.xlsx');
+        }
+
+        updateCounter();
+    </script>
+
+</body>
+</html>
